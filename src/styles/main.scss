@@ -68,8 +68,7 @@ select {
 }
 
 .site-header {
-  width: calc(100% - 48px);
-  margin: 0 auto;
+  width: calc(100%);
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
@@ -728,7 +727,7 @@ select {
   border: 0;
   background: transparent;
   color: rgba(15, 23, 41, 0.5);
-  font-size: 1.5rem;
+  font-size: 1rem;
   font-weight: 800;
   cursor: pointer;
   transition: color 160ms ease;
@@ -801,6 +800,10 @@ select {
       font-size: clamp(1.5rem, 2.4vw, 2rem);
       line-height: 1.08;
       white-space: nowrap;
+    }
+
+    &--actions {
+      justify-content: flex-end;
     }
   }
 }
@@ -983,13 +986,22 @@ select {
 .admin-listing {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'summary actions'
+    'details actions';
   gap: 18px;
   padding: 20px;
   border-radius: 22px;
   border: 1px solid rgba(18, 33, 62, 0.08);
   background: #fff;
 
-  &__body {
+  &__summary {
+    grid-area: summary;
+    min-width: 0;
+  }
+
+  &__details {
+    grid-area: details;
     min-width: 0;
   }
 
@@ -1023,9 +1035,11 @@ select {
   }
 
   &__actions {
+    grid-area: actions;
     display: grid;
     gap: 10px;
     align-content: start;
+    min-width: 140px;
 
     .button {
       width: 100%;
@@ -1102,8 +1116,7 @@ select {
     align-items: flex-start;
   }
 
-  .admin-header,
-  .admin-listing {
+  .admin-header {
     grid-template-columns: 1fr;
   }
 
@@ -1140,6 +1153,15 @@ select {
 
   .admin-gallery {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-listing {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'summary'
+      'details'
+      'actions';
+    gap: 18px;
   }
 
   .admin-listing__actions {
@@ -1226,7 +1248,7 @@ select {
   }
 
   .admin-gallery {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 
   .admin-panel__header h2 {

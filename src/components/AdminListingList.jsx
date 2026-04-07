@@ -30,11 +30,7 @@ function AdminListingList({
 }) {
   return (
     <section className="admin-panel admin-panel--list">
-      <div className="admin-panel__header">
-        <div>
-          <h2>Manage Properties</h2>
-        </div>
-
+      <div className="admin-panel__header admin-panel__header--actions">
         <button className="button button--ghost button--compact" type="button" onClick={onRefresh}>
           <RefreshCw size={16} />
           <span>Refresh</span>
@@ -47,7 +43,7 @@ function AdminListingList({
         <div className="admin-list">
           {listings.map((listing) => (
             <article className="admin-listing" key={listing.id}>
-              <div className="admin-listing__body">
+              <div className="admin-listing__summary">
                 <div className="admin-listing__topline">
                   <span className={`admin-type-pill admin-type-pill--${listing.listingType}`}>
                     {listingTypeLabels[listing.listingType] || 'Listing'}
@@ -58,6 +54,9 @@ function AdminListingList({
                 </div>
 
                 <h3>{listing.title}</h3>
+              </div>
+
+              <div className="admin-listing__details">
                 <p className="admin-listing__location">
                   {[listing.address, listing.city, listing.state, listing.zipCode]
                     .filter(Boolean)

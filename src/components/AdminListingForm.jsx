@@ -19,12 +19,6 @@ function AdminListingForm({
 
   return (
     <section className="admin-panel admin-panel--form">
-      <div className="admin-panel__header">
-        <div>
-          <h2>{isEditing ? 'Edit Property' : 'Add Property'}</h2>
-        </div>
-      </div>
-
       <form className="admin-form" onSubmit={onSubmit}>
         <label>
           <span>Title</span>
@@ -32,7 +26,7 @@ function AdminListingForm({
             name="title"
             value={formState.title}
             onChange={onChange}
-            placeholder="Wyndham Family Home"
+            placeholder="Property title"
             required
           />
         </label>
@@ -53,7 +47,7 @@ function AdminListingForm({
               name="price"
               value={formState.price}
               onChange={onChange}
-              placeholder="$485,000"
+              placeholder="$"
               required
             />
           </label>
@@ -65,7 +59,7 @@ function AdminListingForm({
             name="address"
             value={formState.address}
             onChange={onChange}
-            placeholder="2847 Wyndham Dr"
+            placeholder="Street address"
             required
           />
         </label>
@@ -77,13 +71,13 @@ function AdminListingForm({
               name="city"
               value={formState.city}
               onChange={onChange}
-              placeholder="Glen Allen"
+              placeholder="City"
             />
           </label>
 
           <label>
             <span>State</span>
-            <input name="state" value={formState.state} onChange={onChange} placeholder="VA" />
+            <input name="state" value={formState.state} onChange={onChange} placeholder="State" />
           </label>
 
           <label>
@@ -92,7 +86,7 @@ function AdminListingForm({
               name="zipCode"
               value={formState.zipCode}
               onChange={onChange}
-              placeholder="23060"
+              placeholder="ZIP code"
             />
           </label>
         </div>
@@ -138,7 +132,7 @@ function AdminListingForm({
                     onChange={(event) =>
                       onGalleryImageUrlChange(index, event.target.value)
                     }
-                    placeholder="https://example.com/photo.jpg"
+                    placeholder="Image URL"
                   />
                 </label>
                 <button
@@ -184,7 +178,7 @@ function AdminListingForm({
             rows="5"
             value={formState.description}
             onChange={onChange}
-            placeholder="Short marketing description for the listing."
+            placeholder="Property description"
           />
         </label>
 
