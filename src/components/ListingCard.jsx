@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 const statusMap = {
   sale: 'For Sale',
@@ -18,9 +19,11 @@ function formatMetric(value, label) {
   return `${value} ${label}`
 }
 
-function ListingCard({ listing }) {
+function ListingCard({ listing, onOpen }) {
   const galleryImages =
-    listing.galleryImageUrls?.length ? listing.galleryImageUrls : [listing.coverImageUrl]
+    listing.galleryImageUrls?.length
+      ? listing.galleryImageUrls
+      : [listing.coverImageUrl].filter(Boolean)
   const photoCount = galleryImages.length
   const [activeIndex, setActiveIndex] = useState(0)
   const trackRef = useRef(null)
@@ -57,8 +60,25 @@ function ListingCard({ listing }) {
     setActiveIndex(Math.max(0, Math.min(nextIndex, photoCount - 1)))
   }
 
+  function handleOpen() {
+    onOpen?.()
+  }
+
+  function handleKeyDown(event) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      handleOpen()
+    }
+  }
+
   return (
-    <article className="listing-card">
+    <article
+      className={`listing-card${onOpen ? ' listing-card--interactive' : ''}`}
+      role={onOpen ? 'button' : undefined}
+      tabIndex={onOpen ? 0 : undefined}
+      onClick={handleOpen}
+      onKeyDown={handleKeyDown}
+    >
       <div className="listing-card__media">
         <div
           key={`${listing.id}-${photoCount}-${listing.coverImageUrl}`}
@@ -87,20 +107,26 @@ function ListingCard({ listing }) {
               <button
                 type="button"
                 className="listing-card__arrow"
-                onClick={() => scrollToIndex(currentIndex - 1)}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  scrollToIndex(currentIndex - 1)
+                }}
                 disabled={currentIndex === 0}
                 aria-label="Previous photo"
               >
-                ←
+                <ChevronLeft size={18} />
               </button>
               <button
                 type="button"
                 className="listing-card__arrow"
-                onClick={() => scrollToIndex(currentIndex + 1)}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  scrollToIndex(currentIndex + 1)
+                }}
                 disabled={currentIndex === photoCount - 1}
                 aria-label="Next photo"
               >
-                →
+                <ChevronRight size={18} />
               </button>
             </div>
           </div>

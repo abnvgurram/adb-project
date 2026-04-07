@@ -1,3 +1,5 @@
+import { Eye, EyeOff, PencilLine, RefreshCw, Trash2 } from 'lucide-react'
+
 function formatUpdatedAt(value) {
   if (!value) {
     return 'Just now'
@@ -30,12 +32,12 @@ function AdminListingList({
     <section className="admin-panel admin-panel--list">
       <div className="admin-panel__header">
         <div>
-          <span className="section-heading__eyebrow">Listings</span>
-          <h2>Manage what appears on the website</h2>
+          <h2>Manage Properties</h2>
         </div>
 
-        <button className="button button--ghost" type="button" onClick={onRefresh}>
-          Refresh
+        <button className="button button--ghost button--compact" type="button" onClick={onRefresh}>
+          <RefreshCw size={16} />
+          <span>Refresh</span>
         </button>
       </div>
 
@@ -72,21 +74,24 @@ function AdminListingList({
 
               <div className="admin-listing__actions">
                 <button className="button button--ghost" type="button" onClick={() => onEdit(listing)}>
-                  Edit
+                  <PencilLine size={16} />
+                  <span>Edit</span>
                 </button>
                 <button
                   className="button button--ghost"
                   type="button"
                   onClick={() => onTogglePublished(listing)}
                 >
-                  {listing.published ? 'Unpublish' : 'Publish'}
+                  {listing.published ? <EyeOff size={16} /> : <Eye size={16} />}
+                  <span>{listing.published ? 'Unpublish' : 'Publish'}</span>
                 </button>
                 <button
                   className="button button--danger"
                   type="button"
                   onClick={() => onDelete(listing)}
                 >
-                  Delete
+                  <Trash2 size={16} />
+                  <span>Delete</span>
                 </button>
               </div>
             </article>

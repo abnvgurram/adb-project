@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import AdminListingForm from '../components/AdminListingForm.jsx'
 import AdminListingList from '../components/AdminListingList.jsx'
+import SiteHeader from '../components/SiteHeader.jsx'
 import { createListing, deleteListing, getAdminListings, updateListing } from '../lib/listingsApi.js'
 
-const adminAccessKey = 'srg-admin-unlocked'
 const adminInfoDismissKey = 'srg-admin-info-dismissed'
+const adminTabs = {
+  add: 'add',
+  manage: 'manage',
+}
 
 function createEmptyFormState() {
   return {
@@ -14,7 +17,7 @@ function createEmptyFormState() {
     price: '',
     address: '',
     city: '',
-    state: 'VA',
+    state: '',
     zipCode: '',
     beds: '0',
     baths: '0',
@@ -40,7 +43,7 @@ function toFormState(listing) {
     price: listing.price || '',
     address: listing.address || '',
     city: listing.city || '',
-    state: listing.state || 'VA',
+    state: listing.state || '',
     zipCode: listing.zipCode || '',
     beds: String(listing.beds ?? 0),
     baths: String(listing.baths ?? 0),
@@ -53,15 +56,13 @@ function toFormState(listing) {
 }
 
 function AdminPage() {
-  const [isUnlocked, setIsUnlocked] = useState(() => {
-    return window.localStorage.getItem(adminAccessKey) === 'true'
-  })
   const [showAdminInfo, setShowAdminInfo] = useState(() => {
     return window.localStorage.getItem(adminInfoDismissKey) !== 'true'
   })
   const [listings, setListings] = useState([])
   const [formState, setFormState] = useState(createEmptyFormState)
   const [editingId, setEditingId] = useState(null)
+  const [activeTab, setActiveTab] = useState(adminTabs.add)
   const [isLoading, setIsLoading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
@@ -110,17 +111,8 @@ function AdminPage() {
   }
 
   useEffect(() => {
-    if (!isUnlocked) {
-      return
-    }
-
     loadListings()
-  }, [isUnlocked])
-
-  function handleUnlock() {
-    window.localStorage.setItem(adminAccessKey, 'true')
-    setIsUnlocked(true)
-  }
+  }, [])
 
   function handleDismissAdminInfo() {
     window.localStorage.setItem(adminInfoDismissKey, 'true')
@@ -208,6 +200,7 @@ function AdminPage() {
       }
 
       handleReset()
+      setActiveTab(adminTabs.manage)
       await loadListings()
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : 'Failed to save listing.')
@@ -219,6 +212,7 @@ function AdminPage() {
   function handleEdit(listing) {
     setEditingId(listing.id)
     setFormState(toFormState(listing))
+    setActiveTab(adminTabs.add)
     setNoticeMessage(`Editing "${listing.title}"`)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -265,84 +259,83 @@ function AdminPage() {
     }
   }
 
-  if (!isUnlocked) {
-    return (
-      <main className="admin-gate-shell">
-        <button className="button button--admin-login" type="button" onClick={handleUnlock}>
-          Login As Admin -&gt;
-        </button>
-      </main>
-    )
-  }
-
   return (
-    <main className="admin-shell">
-      <header className="admin-header">
-        <div>
-          <span className="section-heading__eyebrow">Temporary Admin</span>
-          <h1>Listings control panel</h1>
-          <p>
-            This version uses a one-button local gate only. Backend permissions
-            are intentionally open for local testing and must be locked down
-            before any real deployment.
-          </p>
-        </div>
+    <>
+      <SiteHeader actionLabel="Exit Admin" actionTo="/" />
 
-        <div className="admin-header__actions">
-          <Link className="button button--ghost" to="/">
-            View Website
-          </Link>
+      <main className="admin-shell">
+        <header className="admin-header">
+          <div>
+            <h1>Control Panel</h1>
+          </div>
+        </header>
+
+        {errorMessage ? (
+          <div className="status-banner status-banner--demo">{errorMessage}</div>
+        ) : null}
+        {noticeMessage ? (
+          <div className="status-banner status-banner--nhost">{noticeMessage}</div>
+        ) : null}
+
+        {showAdminInfo ? (
+          <section className="admin-warning">
+            <p>
+              This admin currently depends on open `public` permissions for local
+              testing. Setup details are saved in `nhost/SETUP.md`.
+            </p>
+            <button
+              className="button button--ghost"
+              type="button"
+              onClick={handleDismissAdminInfo}
+            >
+              Dismiss
+            </button>
+          </section>
+        ) : null}
+
+        <nav className="admin-tabs" aria-label="Admin sections">
           <button
-            className="button button--ghost"
+            className={activeTab === adminTabs.add ? 'admin-tab is-active' : 'admin-tab'}
             type="button"
-            onClick={() => {
-              window.localStorage.removeItem(adminAccessKey)
-              setIsUnlocked(false)
-            }}
+            onClick={() => setActiveTab(adminTabs.add)}
           >
-            Exit Admin
+            Add Property
           </button>
+          <button
+            className={activeTab === adminTabs.manage ? 'admin-tab is-active' : 'admin-tab'}
+            type="button"
+            onClick={() => setActiveTab(adminTabs.manage)}
+          >
+            Manage Properties
+          </button>
+        </nav>
+
+        <div className="admin-content">
+          {activeTab === adminTabs.add ? (
+            <AdminListingForm
+              formState={formState}
+              isEditing={Boolean(editingId)}
+              saving={isSaving}
+              onChange={handleChange}
+              onGalleryImageUrlChange={handleGalleryImageUrlChange}
+              onAddGalleryImageField={handleAddGalleryImageField}
+              onRemoveGalleryImageField={handleRemoveGalleryImageField}
+              onSubmit={handleSubmit}
+              onReset={handleReset}
+            />
+          ) : (
+            <AdminListingList
+              listings={listings}
+              loading={isLoading}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onTogglePublished={handleTogglePublished}
+              onRefresh={loadListings}
+            />
+          )}
         </div>
-      </header>
-
-      {errorMessage ? <div className="status-banner status-banner--demo">{errorMessage}</div> : null}
-      {noticeMessage ? <div className="status-banner status-banner--nhost">{noticeMessage}</div> : null}
-
-      {showAdminInfo ? (
-        <section className="admin-warning">
-          <p>
-            This admin currently depends on open `public` permissions for local
-            testing. Setup details are saved in `nhost/SETUP.md`.
-          </p>
-          <button className="button button--ghost" type="button" onClick={handleDismissAdminInfo}>
-            Dismiss
-          </button>
-        </section>
-      ) : null}
-
-      <div className="admin-layout">
-        <AdminListingForm
-          formState={formState}
-          isEditing={Boolean(editingId)}
-          saving={isSaving}
-          onChange={handleChange}
-          onGalleryImageUrlChange={handleGalleryImageUrlChange}
-          onAddGalleryImageField={handleAddGalleryImageField}
-          onRemoveGalleryImageField={handleRemoveGalleryImageField}
-          onSubmit={handleSubmit}
-          onReset={handleReset}
-        />
-
-        <AdminListingList
-          listings={listings}
-          loading={isLoading}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onTogglePublished={handleTogglePublished}
-          onRefresh={loadListings}
-        />
-      </div>
-    </main>
+      </main>
+    </>
   )
 }
 

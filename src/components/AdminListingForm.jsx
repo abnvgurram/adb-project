@@ -1,3 +1,5 @@
+import { Plus, RotateCcw, Save, Trash2 } from 'lucide-react'
+
 function AdminListingForm({
   formState,
   isEditing,
@@ -19,8 +21,7 @@ function AdminListingForm({
     <section className="admin-panel admin-panel--form">
       <div className="admin-panel__header">
         <div>
-          <span className="section-heading__eyebrow">Listing Form</span>
-          <h2>{isEditing ? 'Edit listing' : 'Add a new listing'}</h2>
+          <h2>{isEditing ? 'Edit Property' : 'Add Property'}</h2>
         </div>
       </div>
 
@@ -145,7 +146,8 @@ function AdminListingForm({
                   type="button"
                   onClick={() => onRemoveGalleryImageField(index)}
                 >
-                  Delete
+                  <Trash2 size={16} />
+                  <span>Delete</span>
                 </button>
               </div>
             ))}
@@ -158,7 +160,8 @@ function AdminListingForm({
               onClick={onAddGalleryImageField}
               disabled={!canAddAnotherImage}
             >
-              + Add another
+              <Plus size={16} />
+              <span>Add another</span>
             </button>
           </div>
         </div>
@@ -209,7 +212,8 @@ function AdminListingForm({
 
         <div className="admin-form__actions">
           <button className="button button--primary" type="submit" disabled={saving}>
-            {saving ? 'Saving...' : isEditing ? 'Update Listing' : 'Create Listing'}
+            <Save size={16} />
+            <span>{saving ? 'Saving...' : isEditing ? 'Update Property' : 'Add Property'}</span>
           </button>
           <button
             className="button button--ghost"
@@ -217,7 +221,8 @@ function AdminListingForm({
             onClick={onReset}
             disabled={saving}
           >
-            Reset
+            <RotateCcw size={16} />
+            <span>Reset</span>
           </button>
         </div>
       </form>
